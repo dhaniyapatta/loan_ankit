@@ -17,7 +17,7 @@ public class AdminController {
 	@Autowired
 	private AdminRepository adminRepo;
 	@Autowired
-	private EmployeeRepository employeeRepo;
+	private EmployeeRepository empRepo;
 	
 	@Autowired
 	AdminLoginService loginService;
@@ -31,9 +31,18 @@ public class AdminController {
 		return (Admin) adminRepo.save(admin) ;
 	}
 
-	@PostMapping("/addEmployee")
-	public Employee addEmployee(@RequestBody Employee employee) {
-		return (Employee) employeeRepo.save(employee) ;
+	@PostMapping("/addCustomer")
+	public Employee addCustomer(@RequestBody Employee employee) {
+		boolean ifExists=empRepo.existsById(employee.getEmployeeId());
+		if(ifExists)
+		{
+			Employee tempEmp=empRepo.getReferenceById(employee.getEmployeeId());
+			return tempEmp;
+		}
+		else {
+			return empRepo.save(employee);
+		}
+	}
 	}
 
 	@PostMapping("/login")
