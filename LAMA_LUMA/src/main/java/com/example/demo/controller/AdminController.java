@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import com.example.demo.entity.Admin;
 import com.example.demo.entity.Employee;
 import com.example.demo.repository.AdminRepository;
 import com.example.demo.repository.EmployeeRepository;
+import com.example.demo.service.AdminEmployeeService;
 import com.example.demo.service.AdminLoginService;
 
 @RestController
@@ -28,6 +30,9 @@ public class AdminController {
 	@Autowired
 	AdminLoginService loginService;
 	
+	@Autowired
+	AdminEmployeeService adminservice;
+	
 	@GetMapping("/")
 	public String sayHello() {
 		return "Hello!";
@@ -37,37 +42,27 @@ public class AdminController {
 		return (Admin) adminRepo.save(admin) ;
 	}
 
-	@PostMapping("/addCustomer")
+	@PostMapping("/addEmployee")
 	public Employee addCustomer(@RequestBody Employee employee) {
-		boolean ifExists=empRepo.existsById(employee.getEmployeeId());
-		if(ifExists)
-		{
-			Employee tempEmp=empRepo.getReferenceById(employee.getEmployeeId());
-			return tempEmp;
-		}
-		else {
-			return empRepo.save(employee);
-		}
+		Employee temp= adminservice.addEmployee(employee);
+		return temp;
 	}
 	
-	@GetMapping("/showAllCustomer")
+	@GetMapping("/showAllEmployee")
 	public List<Employee> showallcust(){
-		return empRepo.findAll();
+		return adminservice.ShowAllEmployee();
 	}
 	
-	@DeleteMapping("/employee/{id}")	
-	public ResponseEntity<String> deleteEmployee(@RequestBody Employee employee, @PathVariable("id") int id) { {
-      boolean ifExists=empRepo.existsById(employee.getEmployeeId());
-	  if(!ifExists) {
-			return new ResponseEntity<>("No such Employee",HttpStatus.BAD_REQUEST);
-		}
-		else{
-			empRepo.deleteById(id+"");
-			return new ResponseEntity<>("Successfully deleted employee",HttpStatus.OK);
-		}
-	}
+	 @DeleteMapping("/deleteEmployee/{id}")	
+		public ResponseEntity<String> deleteEmployee(@PathVariable("id") String id) {
+		 return adminservice.deleteEmployee(id);
+	   
 	}
 	
+	 @PostMapping("/updateEmployee")
+		public ResponseEntity<String> updateEmployee(@RequestBody Employee employee) {
+				return adminservice.updateEmployee(employee);
+			}
 
 	@PostMapping("/login")
 	public String login(@RequestBody Admin admin) {
